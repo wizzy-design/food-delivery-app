@@ -1,6 +1,18 @@
-import { Stack } from "expo-router";
+import useAuthStore from "@/store/auth.store";
+import { Slot } from "expo-router";
+import { useEffect } from "react";
 import "./globals.css";
 
 export default function RootLayout() {
-  return <Stack />;
+  const { fetchAuthenticatedUser, initializeAuthListener } = useAuthStore();
+
+  useEffect(() => {
+    // Fetch initial session
+    fetchAuthenticatedUser();
+    // Start listening to auth changes
+    const cleanup = initializeAuthListener();
+    return cleanup;
+  }, []);
+
+  return <Slot />;
 }
