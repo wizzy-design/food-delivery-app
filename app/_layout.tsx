@@ -1,4 +1,10 @@
 import useAuthStore from "@/store/auth.store";
+import {
+  Rubik_400Regular,
+  Rubik_500Medium,
+  Rubik_700Bold,
+  Rubik_900Black,
+} from "@expo-google-fonts/rubik";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
@@ -14,6 +20,10 @@ export default function RootLayout() {
     "QuickSand-Regular": require("../assets/fonts/Quicksand-Regular.ttf"),
     "QuickSand-SemiBold": require("../assets/fonts/Quicksand-SemiBold.ttf"),
     "QuickSand-Light": require("../assets/fonts/Quicksand-Light.ttf"),
+    Rubik_400Regular,
+    Rubik_500Medium,
+    Rubik_700Bold,
+    Rubik_900Black,
   });
 
   useEffect(() => {

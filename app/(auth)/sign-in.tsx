@@ -34,7 +34,7 @@ const SignIn = () => {
   };
 
   return (
-    <View className="mt-10 mx-5 gap-10 bg-white">
+    <View className="mt-10 mx-[30px] gap-10 bg-white">
       <CustomInput
         label="Email address"
         placeholder="Enter email address"
@@ -55,11 +55,16 @@ const SignIn = () => {
         secureTextEntry={true}
       />
 
-      <CustomButton title="Login" isLoading={isSubmitting} onPress={submit} />
+      <CustomButton
+        title="Login"
+        isLoading={isSubmitting}
+        onPress={submit}
+        disabled={isSubmitting}
+      />
 
       <View className="flex-row justify-center">
         <Text className="text-gray-100 base-regular">
-          Don’t have an account?
+          Don’t have an account?{" "}
         </Text>
         <Link href={"/sign-up"} className="base-bold text-primary">
           Sign up
