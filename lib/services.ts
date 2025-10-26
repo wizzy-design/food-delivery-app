@@ -26,3 +26,9 @@ export const getSession = async () => {
   if (error) throw error;
   return data.session;
 };
+
+export const signOut = async () => {
+  const { error } = await supabase.auth.signOut();
+
+  if (error) throw error;
+};

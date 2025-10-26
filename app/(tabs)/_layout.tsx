@@ -1,3 +1,4 @@
+import ButtonBadge from "@/components/ButtonBadge";
 import { images } from "@/constants";
 import useAuthStore from "@/store/auth.store";
 import { TabBarIconProps } from "@/type";
@@ -78,18 +79,23 @@ const TabLayout = () => {
   );
 };
 
-const TabBarIcon = ({ focused, icon, title }: TabBarIconProps) => {
+const TabBarIcon = ({ focused, icon, title, badgeCount }: TabBarIconProps) => {
   return (
-    <View className="tab-icon ">
-      <Image
-        source={icon}
-        className="size-[28px]"
-        resizeMode="contain"
-        tintColor={focused ? "#FE8C00" : "#181C2EB2"}
-      />
+    <View className="tab-icon !gap-1.5">
+      <View className="relative">
+        <Image
+          source={icon}
+          className="size-[28px]"
+          resizeMode="contain"
+          tintColor={focused ? "#FE8C00" : "#181C2EB2"}
+        />
+
+        {badgeCount && <ButtonBadge count={badgeCount} />}
+      </View>
+
       <Text
         className={cn(
-          "text-sm font-bold",
+          "body-semibold",
           focused ? "text-primary" : "text-gray-100"
         )}
       >

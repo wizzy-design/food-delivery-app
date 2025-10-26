@@ -10,6 +10,8 @@ import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import "./globals.css";
 
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
   const { fetchAuthenticatedUser, initializeAuthListener, isLoading } =
     useAuthStore();

@@ -125,6 +125,10 @@
     @apply text-base font-quicksand-medium;
   }
 
+  .body-semibold {
+    @apply text-sm font-quicksand-semibold;
+  }
+
   .body-medium {
     @apply text-sm font-quicksand-medium;
   }
