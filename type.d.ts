@@ -34,6 +34,7 @@ export interface User {
     name: string;
     phone_verified: boolean;
     sub: string;
+    avatar_url: string;
   };
   identities: {
     identity_id: string;

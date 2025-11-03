@@ -60,7 +60,13 @@ export const uploadProfilePic = async (userId: string) => {
 
   // Get public URL (if bucket is public)
   const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
-  const publicUrl = data.publicUrl;
+  const publicUrl = `${data.publicUrl}?t=${Date.now()}`;
+  
+  // Update user metadata too
+  const { error: metadataError } = await supabase.auth.updateUser({
+    data: { avatar_url: publicUrl },
+  });
+  if (metadataError) throw metadataError;
 
   // Update OR Insert into profiles
   const { data: exisitingProfile } = await supabase

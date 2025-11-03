@@ -3,6 +3,7 @@ import { images } from "@/constants";
 import { signOut, uploadProfilePic } from "@/lib/services";
 import useAuthStore from "@/store/auth.store";
 import { ProfileCardProps } from "@/type";
+import cn from "clsx";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -59,16 +60,30 @@ const Profile = () => {
     <SafeAreaView className="px-5 py-5">
       <CustomHeader title="Profile" />
 
-      <ScrollView>
+      <ScrollView
+        contentContainerClassName="pb-32"
+        showsVerticalScrollIndicator={false}
+      >
         <View className="items-center mb-[30px]">
           <TouchableOpacity
             className="relative"
             onPress={handleUploadProfilePic}
           >
+            {isSubmitting && (
+              <ActivityIndicator
+                size={"large"}
+                className="absolute z-50 top-1/2 -translate-y-1/2 left-[30px]"
+                color={"#FE8C00"}
+              />
+            )}
+
             <Image
               source={avatar ? { uri: avatar } : images.avatar}
               resizeMode="cover"
-              className="size-[100px] rounded-full"
+              className={cn(
+                isSubmitting && "opacity-20",
+                "size-[100px] rounded-full"
+              )}
             />
             <View className="bg-primary size-7 rounded-full items-center justify-center top-[72px] left-[72px] absolute border border-white border-1">
               <Image source={images.pencil} className="size-4" />
