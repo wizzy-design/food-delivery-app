@@ -1,6 +1,6 @@
 import CustomHeader from "@/components/CustomHeader";
 import { images } from "@/constants";
-import { signOut } from "@/lib/services";
+import { signOut, uploadProfilePic } from "@/lib/services";
 import useAuthStore from "@/store/auth.store";
 import { ProfileCardProps } from "@/type";
 import React, { useState } from "react";
@@ -18,6 +18,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const Profile = () => {
   const { user, isAuthenticated } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [avatar, setAvatar] = useState<string | null>(
+    user?.user_metadata?.avatar_url || null
+  );
 
   if (!isAuthenticated) return null;
 
@@ -36,11 +39,43 @@ const Profile = () => {
     }
   };
 
+  const handleUploadProfilePic = async () => {
+    try {
+      setIsSubmitting(true);
+      const url = await uploadProfilePic(user?.id!);
+      if (url) {
+        setAvatar(url);
+        Alert.alert("Profile Picture Updated!");
+      }
+    } catch (error: any) {
+      console.error(error);
+      Alert.alert("Upload Failed", error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <SafeAreaView className="px-5 py-5">
       <CustomHeader title="Profile" />
 
       <ScrollView>
+        <View className="items-center mb-[30px]">
+          <TouchableOpacity
+            className="relative"
+            onPress={handleUploadProfilePic}
+          >
+            <Image
+              source={avatar ? { uri: avatar } : images.avatar}
+              resizeMode="cover"
+              className="size-[100px] rounded-full"
+            />
+            <View className="bg-primary size-7 rounded-full items-center justify-center top-[72px] left-[72px] absolute border border-white border-1">
+              <Image source={images.pencil} className="size-4" />
+            </View>
+          </TouchableOpacity>
+        </View>
+
         <View className="gap-y-[30px] bg-white rounded-[20px] px-[14px] py-5">
           {[
             {
@@ -82,7 +117,7 @@ const Profile = () => {
         <View className="gap-y-5 mt-[30px]">
           <TouchableOpacity
             className="w-full flex-row items-center justify-center gap-2 border-solid border border-primary bg-[#FE8C000D] rounded-full py-[14px]"
-            onPress={logout}
+            // onPress={logout}
             disabled={isSubmitting}
           >
             <Text className="text-primary paragraph-bold ">Edit Profile</Text>
