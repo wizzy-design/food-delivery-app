@@ -4,6 +4,7 @@ import { signOut, uploadProfilePic } from "@/lib/services";
 import useAuthStore from "@/store/auth.store";
 import { ProfileCardProps } from "@/type";
 import cn from "clsx";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -132,7 +133,7 @@ const Profile = () => {
         <View className="gap-y-5 mt-[30px]">
           <TouchableOpacity
             className="w-full flex-row items-center justify-center gap-2 border-solid border border-primary bg-[#FE8C000D] rounded-full py-[14px]"
-            // onPress={logout}
+            onPress={() => router.navigate("/edit-profile")}
             disabled={isSubmitting}
           >
             <Text className="text-primary paragraph-bold ">Edit Profile</Text>

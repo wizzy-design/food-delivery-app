@@ -1,10 +1,16 @@
 import * as ImagePicker from "expo-image-picker";
 import { supabase } from "./supabase";
 
-export const signUp = async (email: string, password: string, name: string) => {
+export const signUp = async (
+  email: string,
+  password: string,
+  name: string,
+  phone?: string
+) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
+    phone,
     options: { data: { name } },
   });
 
@@ -61,7 +67,7 @@ export const uploadProfilePic = async (userId: string) => {
   // Get public URL (if bucket is public)
   const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
   const publicUrl = `${data.publicUrl}?t=${Date.now()}`;
-  
+
   // Update user metadata too
   const { error: metadataError } = await supabase.auth.updateUser({
     data: { avatar_url: publicUrl },

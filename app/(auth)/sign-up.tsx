@@ -8,10 +8,15 @@ import { Alert, Text, View } from "react-native";
 
 const SignUp = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "", name: "" });
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    name: "",
+    phone: "",
+  });
 
   const submit = async () => {
-    const { email, password, name } = form;
+    const { email, password, name, phone } = form;
     if (!form.email || !form.name || !form.password) {
       return Alert.alert(
         "Invalid input",
@@ -22,7 +27,7 @@ const SignUp = () => {
     setIsSubmitting(true);
 
     try {
-      await signUp(email, password, name);
+      await signUp(email, password, name, phone);
 
       router.replace("/");
     } catch (error: any) {
@@ -45,11 +50,21 @@ const SignUp = () => {
       />
       <CustomInput
         label="Email"
+        keyboardType="email-address"
         placeholder="Enter email address"
         onChangeText={(text) => {
           setForm((prev) => ({ ...prev, email: text }));
         }}
         value={form.email}
+      />
+      <CustomInput
+        label="Phone"
+        keyboardType="phone-pad"
+        placeholder="Enter phone number"
+        onChangeText={(text) => {
+          setForm((prev) => ({ ...prev, phone: text }));
+        }}
+        value={form.phone}
       />
       <CustomInput
         label="Password"
