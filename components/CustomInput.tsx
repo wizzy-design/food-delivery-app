@@ -7,6 +7,7 @@ const CustomInput = ({
   placeholder = "Enter text",
   value,
   onChangeText,
+  required,
   label,
   secureTextEntry = false,
   keyboardType = "default",
@@ -15,7 +16,12 @@ const CustomInput = ({
 
   return (
     <View className="w-full">
-      <Text className="label">{label}</Text>
+      <View className="flex-row items-center">
+        <Text className="text-base text-start font-quicksand-medium text-gray-500 pl-2">
+          {label}
+        </Text>
+        {required && <Text className="font-bold text-red-600 ml-1">*</Text>}
+      </View>
 
       <TextInput
         autoCapitalize="none"

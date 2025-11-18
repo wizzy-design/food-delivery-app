@@ -1,11 +1,12 @@
 import CustomHeader from "@/components/CustomHeader";
 import { images } from "@/constants";
 import { signOut, uploadProfilePic } from "@/lib/services";
+import { supabase } from "@/lib/supabase";
 import useAuthStore from "@/store/auth.store";
 import { ProfileCardProps } from "@/type";
 import cn from "clsx";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -20,13 +21,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const Profile = () => {
   const { user, isAuthenticated } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [profile, setProfile] = useState<any>({});
   const [avatar, setAvatar] = useState<string | null>(
-    user?.user_metadata?.avatar_url || null
+    user?.user_metadata?.avatar_url || profile?.avatar_url || null
   );
-
-  if (!isAuthenticated) return null;
-
-  console.log("User:", JSON.stringify(user, null, 2));
 
   const logout = async () => {
     try {
@@ -56,6 +55,37 @@ const Profile = () => {
       setIsSubmitting(false);
     }
   };
+
+  const fetchProfile = async () => {
+    try {
+      setIsFetching(true);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user?.id)
+        .single();
+
+      if (error) throw error;
+
+      if (data) setProfile(data);
+      console.log("data fetched", data);
+    } catch (e: any) {
+      console.error(e.message);
+      Alert.alert("Error while fetching profile data", e.message);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  useEffect(() => {
+    console.log("Profile state", profile);
+  }, [profile]);
+
+  if (!isAuthenticated) return null;
 
   return (
     <SafeAreaView className="px-5 py-5">
@@ -96,7 +126,7 @@ const Profile = () => {
           {[
             {
               title: "Full Name",
-              value: user?.user_metadata?.name,
+              value: user?.user_metadata?.full_name,
               icon: images.person,
             },
             {
@@ -106,17 +136,19 @@ const Profile = () => {
             },
             {
               title: "Phone Number",
-              value: user?.phone || "+1 555 123 4567",
+              value: profile?.phone_number
+                ? "+234" + profile?.phone_number
+                : "--",
               icon: images.phone,
             },
             {
               title: "Address 1 - (Home)",
-              value: "123 Main Street, Springfield, IL 62704",
+              value: profile?.address_1 || "--",
               icon: images.location,
             },
             {
               title: "Address 2 - (Work)",
-              value: "221B Rose Street, Foodville, FL 12345",
+              value: profile?.address_2 || "--",
               icon: images.location,
             },
           ].map((item, index) => (
@@ -125,6 +157,7 @@ const Profile = () => {
                 title={item.title}
                 content={item.value}
                 icon={item.icon}
+                isFetching={isFetching}
               />
             </View>
           ))}
@@ -133,7 +166,12 @@ const Profile = () => {
         <View className="gap-y-5 mt-[30px]">
           <TouchableOpacity
             className="w-full flex-row items-center justify-center gap-2 border-solid border border-primary bg-[#FE8C000D] rounded-full py-[14px]"
-            onPress={() => router.navigate("/edit-profile")}
+            onPress={() =>
+              router.push({
+                pathname: "/edit-profile",
+                params: { profile: JSON.stringify(profile) },
+              })
+            }
             disabled={isSubmitting}
           >
             <Text className="text-primary paragraph-bold ">Edit Profile</Text>
@@ -164,9 +202,14 @@ const Profile = () => {
 
 export default Profile;
 
-const ProfileCard = ({ icon, title, content }: ProfileCardProps) => {
+const ProfileCard = ({
+  icon,
+  title,
+  content,
+  isFetching,
+}: ProfileCardProps) => {
   return (
-    <View className="flex-row gap-2.5">
+    <View className="flex-row gap-2.5 w-full">
       <View className="size-12 items-center justify-center border-[#FE8C000D] bg-[#FFF9F2] rounded-full">
         <Image
           source={icon}
@@ -176,9 +219,13 @@ const ProfileCard = ({ icon, title, content }: ProfileCardProps) => {
         />
       </View>
 
-      <View className="gap-y-1">
+      <View className="gap-y-2 w-full">
         <Text className="text-[#6A6A6A] body-medium">{title}</Text>
-        <Text className="body-semibold text-[#181C2E]">{content}</Text>
+        {isFetching ? (
+          <View className="w-[80%] h-4 rounded-sm bg-gray-300/80 animate-pulse" />
+        ) : (
+          <Text className="body-semibold text-[#181C2E]">{content}</Text>
+        )}
       </View>
     </View>
   );

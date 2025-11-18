@@ -5,15 +5,26 @@ import { supabase } from "@/lib/supabase";
 import useAuthStore from "@/store/auth.store";
 import { UpdateProfileParams, User } from "@/type";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import { useLocalSearchParams } from "expo-router/build/hooks";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const EditProfile = () => {
-  const { control, handleSubmit } = useForm();
+  const { control, handleSubmit, reset, formState } = useForm({
+    mode: "onChange",
+  });
   const { user } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { profile } = useLocalSearchParams();
+
+  const parsedProfile = React.useMemo(() => {
+    return {
+      email: user?.email,
+      ...JSON.parse(profile as string),
+    };
+  }, [profile, user?.email]);
 
   const submit = async (data: UpdateProfileParams) => {
     setIsSubmitting(true);
@@ -81,6 +92,20 @@ const EditProfile = () => {
     }
   };
 
+  console.log("parsedProfile", parsedProfile?.phone_number);
+
+  useEffect(() => {
+    if (parsedProfile) {
+      reset({
+        full_name: parsedProfile?.full_name,
+        email: parsedProfile?.email,
+        phone_number: String(parsedProfile?.phone_number),
+        address_1: parsedProfile?.address_1,
+        address_2: parsedProfile?.address_2,
+      });
+    }
+  }, [parsedProfile, reset]);
+
   return (
     <SafeAreaView
       style={{ padding: 16, backgroundColor: "white", flex: 1 }}
@@ -90,10 +115,12 @@ const EditProfile = () => {
 
       <View className="mt-10 gap-4">
         <Controller
+          rules={{ required: true }}
           control={control}
           name="full_name"
           render={({ field }) => (
             <CustomInput
+              required
               label="Full Name"
               placeholder="Enter Full Name"
               value={field.value}
@@ -102,11 +129,13 @@ const EditProfile = () => {
           )}
         />
         <Controller
+          rules={{ required: true }}
           control={control}
           name="email"
           defaultValue={""}
           render={({ field }) => (
             <CustomInput
+              required
               label="Email"
               placeholder="Enter email"
               keyboardType="email-address"
@@ -116,11 +145,13 @@ const EditProfile = () => {
           )}
         />
         <Controller
+          rules={{ required: true }}
           control={control}
           name="phone_number"
           defaultValue={""}
           render={({ field }) => (
             <CustomInput
+              required
               label="Phone Number"
               value={field.value}
               placeholder="Enter Phone Number"
@@ -130,11 +161,13 @@ const EditProfile = () => {
           )}
         />
         <Controller
+          rules={{ required: true }}
           control={control}
           name="address_1"
           defaultValue={""}
           render={({ field }) => (
             <CustomInput
+              required
               label="Address 1 - (Home)"
               placeholder="Enter Home Address"
               value={field.value}
@@ -143,11 +176,13 @@ const EditProfile = () => {
           )}
         />
         <Controller
+          rules={{ required: true }}
           control={control}
           name="address_2"
           defaultValue={""}
           render={({ field }) => (
             <CustomInput
+              required
               label="Address 2 - (Work)"
               placeholder="Enter Work Address"
               value={field.value}
@@ -168,7 +203,7 @@ const EditProfile = () => {
           title="Submit"
           isLoading={isSubmitting}
           onPress={handleSubmit(submit)}
-          disabled={isSubmitting}
+          disabled={isSubmitting || !formState.isValid}
         />
       </View>
     </SafeAreaView>

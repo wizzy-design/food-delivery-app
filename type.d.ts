@@ -32,6 +32,7 @@ export interface User {
     email: string;
     email_verified: boolean;
     name: string;
+    full_name: string;
     phone_verified: boolean;
     sub: string;
     avatar_url: string;
@@ -95,6 +96,7 @@ interface TabBarIconProps {
 interface ProfileCardProps {
   icon: ImageSourcePropType;
   title: string;
+  isFetching: boolean;
   content?: string;
 }
 
@@ -122,6 +124,7 @@ interface CustomHeaderProps {
 interface CustomInputProps {
   placeholder?: string;
   value?: string;
+  required?: boolean;
   onChangeText?: (text: string) => void;
   label: string;
   secureTextEntry?: boolean;
