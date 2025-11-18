@@ -20,14 +20,12 @@ const CustomButton = ({
     >
       {leftIcon}
 
-      <View className="flex-center flex-row">
-        {isLoading ? (
-          <ActivityIndicator size="small" color="white" />
-        ) : (
-          <Text className={cn("text-white-100 paragraph-semibold", textStyle)}>
-            {title}
-          </Text>
-        )}
+      <View className="flex-center flex-row gap-4">
+        {isLoading && <ActivityIndicator size="small" color="white" />}
+
+        <Text className={cn("text-white-100 paragraph-semibold", textStyle)}>
+          {title}
+        </Text>
       </View>
     </TouchableOpacity>
   );

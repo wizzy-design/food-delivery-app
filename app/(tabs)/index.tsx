@@ -95,6 +95,7 @@ const Index = () => {
           </View>
         )}
       />
+
     </SafeAreaView>
   );
 };

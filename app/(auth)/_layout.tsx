@@ -10,6 +10,7 @@ import {
   ScrollView,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function AuthLayout() {
   const { isAuthenticated } = useAuthStore();
@@ -18,33 +19,44 @@ export default function AuthLayout() {
   if (isAuthenticated) return <Redirect href="/" />;
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <SafeAreaView
+      edges={["bottom"]}
+      style={{
+        flex: 1,
+        backgroundColor: "white",
+      }}
     >
-      <ScrollView
-        className="h-full bg-white"
-        keyboardShouldPersistTaps="handled"
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View
-          className="relative w-full"
-          style={{ height: Dimensions.get("screen").height / 2.25 }}
+        <ScrollView
+          className="bg-white"
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
         >
-          <ImageBackground
-            source={
-              pathname.includes("/sign-up")
-                ? images.signupGraphic
-                : images.loginGraphic
-            }
-            className="rounded-b-lg size-full"
-            resizeMode="stretch"
-          />
-          <Image
-            source={images.logo}
-            className="absolute -bottom-4 z-10 self-center size-48"
-          />
-        </View>
-        <Slot />
-      </ScrollView>
-    </KeyboardAvoidingView>
+          <View
+            className="relative w-full"
+            style={{ height: Dimensions.get("screen").height / 2.25 }}
+          >
+            <ImageBackground
+              source={
+                pathname.includes("/sign-up")
+                  ? images.signupGraphic
+                  : images.loginGraphic
+              }
+              className="size-full rounded-b-lg rounded-t-none"
+              resizeMode="stretch"
+            />
+            <Image
+              source={images.logo}
+              className="absolute -bottom-4 z-10 size-48 self-center"
+            />
+          </View>
+
+          <Slot />
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

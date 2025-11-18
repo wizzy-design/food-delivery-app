@@ -1,3 +1,4 @@
+import { UpdateProfileParams } from "@/type";
 import * as ImagePicker from "expo-image-picker";
 import { supabase } from "./supabase";
 
@@ -99,6 +100,47 @@ export const uploadProfilePic = async (userId: string) => {
   }
 
   return publicUrl;
+};
+
+export const updateProfile = async (
+  userId: string,
+  data: UpdateProfileParams
+) => {
+  const payload = {
+    ...(data.phone_number && { phone: String(data?.phone_number) }),
+    ...(data.email && { email: data?.email }),
+    data: {
+      ...(data.full_name && { name: data?.full_name }),
+    },
+  };
+
+  // Update user metadata
+  const { error: metadataError } = await supabase.auth.updateUser(payload);
+  if (metadataError) throw metadataError;
+
+  // Update OR Insert into profiles
+  const { data: exisitingProfile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", userId)
+    .single();
+
+  if (exisitingProfile) {
+    // Update user profile with the payload
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update(payload)
+      .eq("id", userId);
+
+    if (updateError) throw updateError;
+  } else {
+    // Insert new profile if missing
+    const { error: insertError } = await supabase
+      .from("profiles")
+      .insert([{ id: userId, ...payload }]);
+
+    if (insertError) throw insertError;
+  }
 };
 
 export const signOut = async () => {

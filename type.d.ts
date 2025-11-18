@@ -149,3 +149,13 @@ interface GetMenuParams {
   category: string;
   query: string;
 }
+
+interface UpdateProfileParams {
+  id?: string;
+  avatar_url?: string | null;
+  phone_number?: number | null;
+  address_1?: string | null;
+  address_2?: string | null;
+  full_name?: string | null;
+  email?: string | null;
+}
