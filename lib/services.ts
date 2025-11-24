@@ -148,3 +148,10 @@ export const signOut = async () => {
 
   if (error) throw error;
 };
+
+export const fetchMenu = async () => {
+  const { data, error } = await supabase.from("menu_items").select("*");
+  if (error) throw error;
+
+  return data;
+};

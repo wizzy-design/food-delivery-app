@@ -1,15 +1,8 @@
-import ButtonBadge from "@/components/ButtonBadge";
+import CustomListHeader from "@/components/CustomListHeader";
 import { images, offers } from "@/constants";
 import cn from "clsx";
 import React, { Fragment } from "react";
-import {
-  FlatList,
-  Image,
-  Pressable,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, Image, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Index = () => {
@@ -64,38 +57,9 @@ const Index = () => {
         }}
         contentContainerClassName="px-5 pb-32"
         ListHeaderComponent={() => (
-          <View className="flex-row justify-between items-center my-5">
-            <View className="gap-1.5">
-              <Text className="small-bold uppercase text-primary">
-                Deliver To
-              </Text>
-
-              <TouchableOpacity className="flex-row items-center gap-1">
-                <Text className="font-quicksand-semibold text-base text-[#181C2E]">
-                  Rijeka, Croatia
-                </Text>
-                <Image
-                  source={images.arrowDown}
-                  resizeMode="contain"
-                  className="w-[14px] h-[8px]"
-                  tintColor={"#181C2E"}
-                />
-              </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity className="bg-[#181C2E] size-10 rounded-full items-center justify-center relative">
-              <Image
-                source={images.bag}
-                resizeMode="contain"
-                className="size-5"
-              />
-
-              <ButtonBadge count={20} />
-            </TouchableOpacity>
-          </View>
+          <CustomListHeader subtitle="Deliver To" title="Rijeka, Croatia" />
         )}
       />
-
     </SafeAreaView>
   );
 };

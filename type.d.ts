@@ -1,17 +1,25 @@
 export interface MenuItem {
+  id: string;
   name: string;
   price: number;
   image_url: string;
-  description: string;
-  calories: number;
-  protein: number;
-  rating: number;
-  type: string;
+  description: string | null;
+  calories: number | null;
+  protein: number | null;
+  rating: number | null;
+  category_name: string;
+}
+
+export interface MenuItemCustomization {
+  id: string;
+  menu_item_id: string;
+  customization_name: string;
 }
 
 export interface Category {
+  id: string;
   name: string;
-  description: string;
+  description: string | null;
 }
 
 export interface User {

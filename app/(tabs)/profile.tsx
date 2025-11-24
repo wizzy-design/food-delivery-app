@@ -68,7 +68,6 @@ const Profile = () => {
       if (error) throw error;
 
       if (data) setProfile(data);
-      console.log("data fetched", data);
     } catch (e: any) {
       console.error(e.message);
       Alert.alert("Error while fetching profile data", e.message);
@@ -80,10 +79,6 @@ const Profile = () => {
   useEffect(() => {
     fetchProfile();
   }, []);
-
-  useEffect(() => {
-    console.log("Profile state", profile);
-  }, [profile]);
 
   if (!isAuthenticated) return null;
 
