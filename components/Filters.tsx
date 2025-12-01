@@ -14,7 +14,7 @@ import {
 const Filters = () => {
   const searchParams = useLocalSearchParams();
   const [filters, setFilters] = useState([{ $id: "all", name: "All" }]);
-  const [active, setActive] = useState(searchParams.category || "all");
+  const [active, setActive] = useState(searchParams.category || "All");
   const [isFetching, setisFetching] = useState(false);
 
   const getCategories = async () => {
@@ -23,7 +23,6 @@ const Filters = () => {
       const { data, error } = await supabase.from("categories").select("*");
 
       if (error) throw error;
-      console.log("category data", JSON.stringify(data, null, 2));
       if (data)
         setFilters((prev) => [
           ...prev,
@@ -31,7 +30,7 @@ const Filters = () => {
             .map((filter) => ({ $id: filter.id, name: filter.name }))
             .filter(
               (newFilter) =>
-                !prev.some((existing) => existing.$id === newFilter.$id)
+                !prev.some((existing) => existing.name === newFilter.name)
             ),
         ]);
     } catch (error: any) {
@@ -42,11 +41,14 @@ const Filters = () => {
     }
   };
 
-  const handlePress = (id: string) => {
-    setActive(id);
+  const handlePress = (name: string) => {
+    setActive(name);
 
-    if (id === "all") router.setParams({ category: undefined });
-    router.setParams({ category: id });
+    if (name === "All") {
+      router.setParams({ category: undefined });
+    } else {
+      router.setParams({ category: name });
+    }
   };
 
   useEffect(() => {
@@ -73,7 +75,7 @@ const Filters = () => {
       renderItem={({ item }) => (
         <TouchableOpacity
           className={cn(
-            active === item.$id ? "bg-amber-500" : "bg-white",
+            active === item.name ? "bg-amber-500" : "bg-white",
             "filter"
           )}
           style={
@@ -81,10 +83,10 @@ const Filters = () => {
               ? { elevation: 5, shadowColor: "#878787" }
               : {}
           }
-          onPress={() => handlePress(item.$id)}
+          onPress={() => handlePress(item.name)}
         >
           <Text
-            className={cn(active === item.$id ? "text-white" : "text-black")}
+            className={cn(active === item.name ? "text-white" : "text-black")}
           >
             {item.name}
           </Text>

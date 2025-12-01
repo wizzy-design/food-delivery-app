@@ -92,8 +92,6 @@ const EditProfile = () => {
     }
   };
 
-  console.log("parsedProfile", parsedProfile?.phone_number);
-
   useEffect(() => {
     if (parsedProfile) {
       reset({

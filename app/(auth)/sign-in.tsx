@@ -26,6 +26,7 @@ const SignIn = () => {
 
       router.replace("/");
     } catch (error: any) {
+      console.error("Sign in error", error);
       Alert.alert("Error", error.message);
       Sentry.captureEvent(error);
     } finally {
