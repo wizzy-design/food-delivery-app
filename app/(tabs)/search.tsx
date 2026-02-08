@@ -16,7 +16,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import emptyState from "../../assets/images/empty-state.png";
+import emptyState from "@/assets/images/empty-state.png";
 
 const Search = () => {
   const { category, query } = useLocalSearchParams<{

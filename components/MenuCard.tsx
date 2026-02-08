@@ -1,5 +1,6 @@
 import { MenuItem } from "@/type";
 import { Image } from "expo-image";
+import { router } from "expo-router";
 import { cssInterop } from "nativewind";
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
@@ -16,7 +17,12 @@ const MenuCard = ({
   item: MenuItem;
 }) => {
   return (
-    <TouchableOpacity className="menu-card">
+    <TouchableOpacity
+      className="menu-card"
+      onPress={() =>
+        router.push({ pathname: "/food-details/[id]", params: { id } })
+      }
+    >
       <Image
         source={{ uri: image_url }}
         className="size-32 absolute -top-10"
