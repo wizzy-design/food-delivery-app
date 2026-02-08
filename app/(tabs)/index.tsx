@@ -18,26 +18,33 @@ const Index = () => {
               <Pressable
                 className={cn(
                   "offer-card",
-                  isEven ? "flex-row" : "flex-row-reverse"
+                  isEven ? "flex-row" : "flex-row-reverse",
                 )}
                 style={{ backgroundColor: item.color }}
                 android_ripple={{ color: "#fffff22" }}
               >
                 {({ pressed }) => (
                   <Fragment>
-                    <View className="h-full w-1/2">
+                    <View
+                      className={cn("h-full w-1/2", index === 0 && "w-2/3")}
+                    >
                       <Image
                         source={item.image}
-                        className="size-full"
-                        resizeMode="contain"
+                        className={cn("size-full")}
+                        resizeMode="cover"
                       />
                     </View>
 
-                    <View className="gap-3.5">
+                    <View
+                      className={cn(
+                        "gap-3.5",
+                        isEven ? "" : "relative -left-12",
+                        index === 0 && "relative -left-[6.7rem]",
+                      )}
+                    >
                       <Text
                         className={cn(
-                          isEven ? "" : "pl-5",
-                          "text-3xl text-white leading-tight font-rubik-extrabold max-w-[170px] text-wrap"
+                          "text-3xl text-white leading-tight font-rubik-extrabold max-w-[170px] text-wrap",
                         )}
                       >
                         {item.title}
@@ -57,7 +64,7 @@ const Index = () => {
         }}
         contentContainerClassName="px-5 pb-32"
         ListHeaderComponent={() => (
-          <CustomListHeader subtitle="Deliver To" title="Rijeka, Croatia" />
+          <CustomListHeader subtitle="Deliver To" title="Asaba, Delta" />
         )}
       />
     </SafeAreaView>
