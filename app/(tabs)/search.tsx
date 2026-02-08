@@ -50,14 +50,8 @@ const Search = () => {
   };
 
   useEffect(() => {
-    console.log("Category name", category);
-    console.log("Search query", query);
     getMenuItems(category, query);
   }, [category, query]);
-
-  useEffect(() => {
-    getMenuItems();
-  }, []);
 
   return (
     <SafeAreaView className="flex-1">
@@ -72,7 +66,7 @@ const Search = () => {
             <View
               className={cn(
                 "flex-1 max-w-[48%] ",
-                isRightColItem ? "mt-0" : "mt-16"
+                isRightColItem ? "mt-0" : "mt-16",
               )}
             >
               <MenuCard item={item} />

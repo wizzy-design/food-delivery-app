@@ -1,6 +1,14 @@
 import { MenuItem } from "@/type";
+import { Image } from "expo-image";
+import { cssInterop } from "nativewind";
 import React from "react";
-import { Image, Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
+
+cssInterop(Image, {
+  className: {
+    target: "style",
+  },
+});
 
 const MenuCard = ({
   item: { id, name, price, image_url },
@@ -12,7 +20,10 @@ const MenuCard = ({
       <Image
         source={{ uri: image_url }}
         className="size-32 absolute -top-10"
-        resizeMode="contain"
+        style={{ width: 128, height: 128 }}
+        contentFit="contain"
+        transition={500}
+        cachePolicy="disk"
       />
 
       <Text
