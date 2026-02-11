@@ -6,7 +6,7 @@ import {
   Rubik_900Black,
 } from "@expo-google-fonts/rubik";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack } from "expo-router";
+import { Redirect, SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import "./globals.css";
 
@@ -42,6 +42,11 @@ export default function RootLayout() {
   }, []);
 
   if (isLoading || !fontsLoaded) return null;
+
+  // 🛠️ DEV SHORTCUT: Set your current food ID here to auto-jump to the details page on reload
+  const DEV_ID = "9575f303-c01d-4956-9f1c-1b215eb62527";
+  if (__DEV__ && DEV_ID !== "9575f303-c01d-4956-9f1c-1b215eb62527")
+    return <Redirect href={`/(pages)/food-details/${DEV_ID}`} />;
 
   return <Stack screenOptions={{ headerShown: false }} />;
 }
