@@ -1,3 +1,4 @@
+import useCartStore from "@/store/cart.store";
 import { MenuItem } from "@/type";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -11,20 +12,22 @@ cssInterop(Image, {
   },
 });
 
-const MenuCard = ({
-  item: { id, name, price, image_url },
-}: {
-  item: MenuItem;
-}) => {
+const MenuCard = ({ item }: { item: MenuItem }) => {
+  const { items, addToCart, removeFromCart } = useCartStore();
+  const isInCart = items.some((i) => i.id === item?.id);
+
   return (
     <TouchableOpacity
       className="menu-card"
       onPress={() =>
-        router.push({ pathname: "/food-details/[id]", params: { id } })
+        router.push({
+          pathname: "/food-details/[id]",
+          params: { id: item?.id },
+        })
       }
     >
       <Image
-        source={{ uri: image_url }}
+        source={{ uri: item?.image_url }}
         className="size-32 absolute -top-10"
         style={{ width: 128, height: 128 }}
         contentFit="contain"
@@ -36,14 +39,31 @@ const MenuCard = ({
         className="text-center base-bold text-dark-100 mb-2"
         numberOfLines={2}
       >
-        {name}
+        {item?.name}
       </Text>
       <Text className="body-regular font-quicksand-semibold text-gray-100 mb-4">
-        From ${price}
+        From ${item?.price}
       </Text>
 
-      <TouchableOpacity className="">
-        <Text className="text-primary font-quicksand-bold">Add to Cart +</Text>
+      <TouchableOpacity
+        className=""
+        onPress={() => {
+          if (isInCart) {
+            removeFromCart(item?.id!);
+          } else {
+            addToCart({
+              id: item?.id!,
+              name: item?.name!,
+              price: item?.price!,
+              quantity: 1,
+              image_url: item?.image_url!,
+            });
+          }
+        }}
+      >
+        <Text className="text-primary font-quicksand-bold">
+          {isInCart ? "Remove from cart" : "Add to Cart +"}
+        </Text>
       </TouchableOpacity>
     </TouchableOpacity>
   );

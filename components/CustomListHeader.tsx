@@ -1,5 +1,7 @@
 import { images } from "@/constants";
+import useCartStore from "@/store/cart.store";
 import cn from "clsx";
+import { router } from "expo-router";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import ButtonBadge from "./ButtonBadge";
@@ -13,6 +15,7 @@ const CustomListHeader = ({
   title: string;
   className?: string;
 }) => {
+  const { items } = useCartStore();
   return (
     <View
       className={cn(className, "flex-row justify-between items-center my-5")}
@@ -33,10 +36,13 @@ const CustomListHeader = ({
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity className="bg-[#181C2E] size-10 rounded-full items-center justify-center relative">
+      <TouchableOpacity
+        className="bg-[#181C2E] size-10 rounded-full items-center justify-center relative"
+        onPress={() => router.push("/cart")}
+      >
         <Image source={images.bag} resizeMode="contain" className="size-5" />
 
-        <ButtonBadge count={20} />
+        <ButtonBadge count={items.length} />
       </TouchableOpacity>
     </View>
   );
