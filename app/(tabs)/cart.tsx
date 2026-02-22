@@ -3,20 +3,34 @@ import { images } from "@/constants";
 import useCartStore from "@/store/cart.store";
 import cn from "clsx";
 import { Image } from "expo-image";
-import React from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { router } from "expo-router";
+import React, { useState } from "react";
+import { FlatList, Modal, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Cart = () => {
-  const { items, removeFromCart } = useCartStore();
+  const { items, removeFromCart, updateQuantity, clearCart } = useCartStore();
+  const [showModal, setShowModal] = useState(false);
 
   const totalItemPrice = items.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0,
   );
-  const deliveryFee = 500;
+  const deliveryFee = items.length > 0 ? 500 : 0;
   const discount = 0;
   const totalAmount = totalItemPrice + deliveryFee - discount;
+
+  const handleOrder = () => {
+    if (items.length === 0) return;
+    setShowModal(true);
+    // Modal will handle clearing cart or we can clear it on close
+  };
+
+  const closeAndClear = () => {
+    setShowModal(false);
+    clearCart();
+    router.push("/search");
+  };
 
   return (
     <SafeAreaView className="px-5 flex-1 bg-[#FAFAFA]">
@@ -61,7 +75,10 @@ const Cart = () => {
           <View className="bg-white h-[106px] w-full rounded-xl flex-row gap-4 py-[13px] px-[12px] mb-4">
             {/* Checkbox */}
             <View className="items-center justify-center">
-              <TouchableOpacity className="bg-primary size-5 items-center justify-center rounded-[4px]">
+              <TouchableOpacity
+                onPress={() => removeFromCart(item.id)}
+                className="bg-primary size-5 items-center justify-center rounded-[4px]"
+              >
                 <Image
                   source={images.check}
                   contentFit="contain"
@@ -93,7 +110,10 @@ const Cart = () => {
 
               <View className="flex-row items-center justify-between ">
                 <View className="flex-row items-center gap-5">
-                  <TouchableOpacity className="bg-[#FE8C001A] size-6 items-center justify-center rounded-[4px]">
+                  <TouchableOpacity
+                    onPress={() => updateQuantity(item.id, item.quantity - 1)}
+                    className="bg-[#FE8C001A] size-6 items-center justify-center rounded-[4px]"
+                  >
                     <Image
                       source={images.minus}
                       contentFit="contain"
@@ -101,10 +121,13 @@ const Cart = () => {
                       tintColor={"#FE8C00"}
                     />
                   </TouchableOpacity>
-                  <Text className="text-dark-100 font-quicksand-bold text-base">
+                  <Text className="text-dark-100 font-quicksand-bold text-base w-4 text-center">
                     {item.quantity}
                   </Text>
-                  <TouchableOpacity className="bg-[#FE8C001A] size-6 items-center justify-center rounded-[4px]">
+                  <TouchableOpacity
+                    onPress={() => updateQuantity(item.id, item.quantity + 1)}
+                    className="bg-[#FE8C001A] size-6 items-center justify-center rounded-[4px]"
+                  >
                     <Image
                       source={images.plus}
                       contentFit="contain"
@@ -127,21 +150,30 @@ const Cart = () => {
           </View>
         )}
         ListFooterComponent={
-          <>
-            <PaymentSummary
-              totalItemPrice={totalItemPrice}
-              deliveryFee={deliveryFee}
-              discount={discount}
-              totalAmount={totalAmount}
-              itemCount={items.length}
-            />
+          items.length > 0 ? (
+            <>
+              <PaymentSummary
+                totalItemPrice={totalItemPrice}
+                deliveryFee={deliveryFee}
+                discount={discount}
+                totalAmount={totalAmount}
+                itemCount={items.length}
+              />
 
-            <TouchableOpacity className="bg-primary h-[50px] rounded-full items-center justify-center mt-[30px]">
-              <Text className="text-white font-quicksand-bold text-base">
-                Order Now
-              </Text>
-            </TouchableOpacity>
-          </>
+              <TouchableOpacity
+                onPress={handleOrder}
+                disabled={items.length === 0}
+                className={cn(
+                  "h-[50px] rounded-full items-center justify-center mt-[30px]",
+                  items.length === 0 ? "bg-gray-200" : "bg-primary",
+                )}
+              >
+                <Text className="text-white font-quicksand-bold text-base">
+                  Order Now
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : null
         }
         ListEmptyComponent={
           <View className="items-center justify-center py-20">
@@ -151,6 +183,42 @@ const Cart = () => {
           </View>
         }
       />
+
+      {/* Order Success Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={showModal}
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black/50 px-5">
+          <View className="bg-white w-full rounded-[30px] p-8 items-center">
+            <View className="bg-[#FE8C001A] size-20 rounded-full items-center justify-center mb-6">
+              <Image
+                source={images.check}
+                contentFit="contain"
+                className="size-10"
+                tintColor={"#FE8C00"}
+              />
+            </View>
+            <Text className="text-2xl font-quicksand-bold text-dark-100 text-center">
+              Order Placed Successfully!
+            </Text>
+            <Text className="text-gray-100 font-quicksand-medium text-center mt-3 mb-8">
+              Your food is on the way. You can track your order in the orders
+              history.
+            </Text>
+            <TouchableOpacity
+              onPress={closeAndClear}
+              className="bg-primary w-full h-[50px] rounded-full items-center justify-center"
+            >
+              <Text className="text-white font-quicksand-bold text-base">
+                Back to Shopping
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
