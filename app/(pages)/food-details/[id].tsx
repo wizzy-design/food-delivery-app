@@ -2,7 +2,8 @@ import CustomHeader from "@/components/CustomHeader";
 import ToppingsCard from "@/components/ToppingsCard";
 import { images } from "@/constants";
 import { supabase } from "@/lib/supabase";
-import { MenuItem } from "@/type";
+import useCartStore from "@/store/cart.store";
+import { MenuItem, Topping } from "@/type";
 import { Image as PerfImage } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -13,16 +14,31 @@ import {
   Image,
   ScrollView,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const SearchId = () => {
   const { id } = useLocalSearchParams();
+  const { addToCart, items, removeFromCart } = useCartStore();
+
   const [item, setItem] = useState<MenuItem | null>(null);
-  const [toppings, setToppings] = useState<any[]>([]);
-  const [sides, setSides] = useState<any[]>([]);
+  const [toppings, setToppings] = useState<Topping[]>([]);
+  const [sides, setSides] = useState<Topping[]>([]);
   const [isFetching, setIsFetching] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [selectedToppings, setSelectedToppings] = useState<Topping[]>([]);
+
+  const toggleTopping = (topping: Topping) => {
+    setSelectedToppings((prev) =>
+      prev.find((t) => t.id === topping.id)
+        ? prev.filter((t) => t.id !== topping.id)
+        : [...prev, topping],
+    );
+  };
+
+  const isInCart = items.some((i) => i.id === id);
 
   useEffect(() => {
     const getItemDetails = async () => {
@@ -190,7 +206,13 @@ const SearchId = () => {
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => <ToppingsCard item={item} />}
+                  renderItem={({ item: t }) => (
+                    <ToppingsCard
+                      item={t}
+                      selected={!!selectedToppings.find((st) => st.id === t.id)}
+                      onPress={() => toggleTopping(t)}
+                    />
+                  )}
                 />
               </View>
             )}
@@ -199,7 +221,7 @@ const SearchId = () => {
             {sides.length > 0 && (
               <View className="mt-8">
                 <Text className="text-dark-100 text-lg font-quicksand-bold mb-4">
-                  Sides
+                  Side Options
                 </Text>
 
                 <FlatList
@@ -207,10 +229,95 @@ const SearchId = () => {
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => <ToppingsCard item={item} />}
+                  renderItem={({ item: t }) => (
+                    <ToppingsCard
+                      item={t}
+                      selected={!!selectedToppings.find((st) => st.id === t.id)}
+                      onPress={() => toggleTopping(t)}
+                    />
+                  )}
                 />
               </View>
             )}
+
+            {/* Footer Bar */}
+            <View
+              style={{ boxShadow: "0px 0px 20px 0px #0000001A" }}
+              className="w-full mt-10 rounded-[20px] bg-white flex-row py-4 px-[18px] justify-between gap-8"
+            >
+              {/* Quantity */}
+              <View className="flex-row items-center gap-4">
+                <TouchableOpacity
+                  className="bg-[#FE8C001A] size-[24px] items-center justify-center rounded-[4px]"
+                  onPress={() => setQuantity(quantity - 1)}
+                >
+                  <PerfImage
+                    source={images.minus}
+                    contentFit="contain"
+                    className="size-5"
+                    tintColor={"#FE8C00"}
+                  />
+                </TouchableOpacity>
+                <Text className="text-dark-100 font-quicksand-bold text-base">
+                  {quantity}
+                </Text>
+                <TouchableOpacity
+                  className="bg-[#FE8C001A] size-[24px] items-center justify-center rounded-[4px]"
+                  onPress={() => setQuantity(quantity + 1)}
+                >
+                  <PerfImage
+                    source={images.plus}
+                    contentFit="contain"
+                    className="size-5"
+                    tintColor={"#FE8C00"}
+                  />
+                </TouchableOpacity>
+              </View>
+
+              {/* Order Button */}
+              <TouchableOpacity
+                className={`${
+                  isInCart ? "bg-white border border-primary" : "bg-primary"
+                } h-[46px] flex-1 px-5 rounded-full flex-row justify-center items-center gap-2 w-full`}
+                onPress={() => {
+                  if (isInCart) {
+                    removeFromCart(item?.id!);
+                  } else {
+                    addToCart({
+                      id: item?.id!,
+                      name: item?.name!,
+                      price:
+                        (item?.price || 0) +
+                        selectedToppings.reduce((acc, t) => acc + t.price, 0),
+                      quantity,
+                      image_url: item?.image_url!,
+                    });
+                  }
+                }}
+              >
+                <PerfImage
+                  source={images.bag}
+                  className="size-[14px]"
+                  tintColor={isInCart ? "#FE8C00" : "white"}
+                />
+                <Text
+                  className={`${
+                    isInCart ? "text-primary" : "text-white"
+                  } font-quicksand-bold text-base`}
+                >
+                  {isInCart
+                    ? "Remove from cart"
+                    : `Add to cart (₦${(
+                        ((item?.price || 0) +
+                          selectedToppings.reduce(
+                            (acc, t) => acc + t.price,
+                            0,
+                          )) *
+                        quantity
+                      ).toFixed(0)})`}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       </ScrollView>

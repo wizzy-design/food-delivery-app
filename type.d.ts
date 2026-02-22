@@ -67,6 +67,14 @@ export interface User {
   is_anonymous: boolean;
 }
 
+export interface Topping {
+  id: string;
+  name: string;
+  price: number;
+  image_url: string;
+  type: "topping" | "side";
+}
+
 export interface CartCustomization {
   id: string;
   name: string;

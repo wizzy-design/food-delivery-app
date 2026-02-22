@@ -1,14 +1,11 @@
 import { images } from "@/constants";
+import { Topping } from "@/type";
 import { Image } from "expo-image";
 import React from "react";
 import { Image as RnImage, Text, TouchableOpacity, View } from "react-native";
 
 interface ToppingsCardProps {
-  item: {
-    name: string;
-    price: number;
-    image_url: string;
-  };
+  item: Topping;
   selected?: boolean;
   onPress?: () => void;
 }
@@ -16,7 +13,11 @@ interface ToppingsCardProps {
 /** For toppings and side dishes */
 const ToppingsCard = ({ item, selected, onPress }: ToppingsCardProps) => {
   return (
-    <TouchableOpacity onPress={onPress} className={`mr-[30px] w-[84px]`}>
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={onPress}
+      className={`mr-[30px] w-[84px]`}
+    >
       <View
         className="z-50 w-full h-[78px] bg-white rounded-[15px] py-4"
         style={{
@@ -54,11 +55,12 @@ const ToppingsCard = ({ item, selected, onPress }: ToppingsCardProps) => {
             {item.name}
           </Text>
 
-          <View className="bg-white rounded-full p-1">
+          <View className="bg-white rounded-full p-1 items-center justify-center">
             <RnImage
-              source={images.plus}
-              className="size-2 "
-              resizeMode="cover"
+              source={selected ? images.check : images.plus}
+              className="size-2"
+              resizeMode="contain"
+              tintColor={selected ? "#FE8C00" : "#3C2F2F"}
             />
           </View>
         </View>
