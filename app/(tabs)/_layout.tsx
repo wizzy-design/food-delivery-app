@@ -97,7 +97,7 @@ const TabBarIcon = ({ focused, icon, title, badgeCount }: TabBarIconProps) => {
           tintColor={focused ? "#FE8C00" : "#181C2EB2"}
         />
 
-        {badgeCount && <ButtonBadge count={badgeCount} />}
+        {!!badgeCount && <ButtonBadge count={badgeCount} />}
       </View>
 
       <Text
