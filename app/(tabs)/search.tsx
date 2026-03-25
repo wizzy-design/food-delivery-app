@@ -3,6 +3,7 @@ import Filters from "@/components/Filters";
 import MenuCard from "@/components/MenuCard";
 import SearchBar from "@/components/SearchBar";
 import { supabase } from "@/lib/supabase";
+import useDataStore from "@/store/data.store";
 import { MenuItem } from "@/type";
 import cn from "clsx";
 import { useLocalSearchParams } from "expo-router";
@@ -25,8 +26,17 @@ const Search = () => {
   }>();
   const [isFetching, setIsFetching] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItem[] | null>();
+  const { menuItemsCache, setMenuItemsCache } = useDataStore();
 
   const getMenuItems = async (category?: string, query?: string) => {
+    const cacheKey = `${category || ""}|${query || ""}`;
+    const cached = menuItemsCache[cacheKey];
+
+    if (cached) {
+      setMenuItems(cached);
+      return;
+    }
+
     try {
       setMenuItems([]);
       setIsFetching(true);
@@ -39,8 +49,9 @@ const Search = () => {
 
       if (error) throw error;
 
-      console.log("Menu items data", JSON.stringify(data, null, 2));
-      setMenuItems(data || []);
+      const items = data || [];
+      setMenuItemsCache(cacheKey, items);
+      setMenuItems(items);
     } catch (error: any) {
       console.error(error);
       Alert.alert("Error occured while fetching menu items", error.message);

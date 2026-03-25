@@ -3,6 +3,7 @@ import { images } from "@/constants";
 import { signOut, uploadProfilePic } from "@/lib/services";
 import { supabase } from "@/lib/supabase";
 import useAuthStore from "@/store/auth.store";
+import useDataStore from "@/store/data.store";
 import { ProfileCardProps } from "@/type";
 import cn from "clsx";
 import { router } from "expo-router";
@@ -23,6 +24,7 @@ const Profile = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [profile, setProfile] = useState<any>({});
+  const { profileCache, setProfileCache } = useDataStore();
   const [avatar, setAvatar] = useState<string | null>(
     user?.user_metadata?.avatar_url || profile?.avatar_url || null
   );
@@ -57,17 +59,30 @@ const Profile = () => {
   };
 
   const fetchProfile = async () => {
+    const userId = user?.id;
+    if (!userId) return;
+
+    // Serve from cache if available
+    const cached = profileCache[userId];
+    if (cached) {
+      setProfile(cached);
+      return;
+    }
+
     try {
       setIsFetching(true);
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", user?.id)
+        .eq("id", userId)
         .single();
 
       if (error) throw error;
 
-      if (data) setProfile(data);
+      if (data) {
+        setProfile(data);
+        setProfileCache(userId, data);
+      }
     } catch (e: any) {
       console.error(e.message);
       Alert.alert("Error while fetching profile data", e.message);

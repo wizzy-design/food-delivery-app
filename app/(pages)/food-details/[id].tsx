@@ -3,6 +3,7 @@ import ToppingsCard from "@/components/ToppingsCard";
 import { images } from "@/constants";
 import { supabase } from "@/lib/supabase";
 import useCartStore from "@/store/cart.store";
+import useDataStore from "@/store/data.store";
 import { MenuItem, Topping } from "@/type";
 import { Image as PerfImage } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
@@ -22,6 +23,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const SearchId = () => {
   const { id } = useLocalSearchParams();
   const { addToCart, items, removeFromCart } = useCartStore();
+  const { foodDetailCache, setFoodDetailCache } = useDataStore();
 
   const [item, setItem] = useState<MenuItem | null>(null);
   const [toppings, setToppings] = useState<Topping[]>([]);
@@ -42,6 +44,17 @@ const SearchId = () => {
 
   useEffect(() => {
     const getItemDetails = async () => {
+      const itemId = String(id);
+
+      // Serve from cache if available
+      const cached = foodDetailCache[itemId];
+      if (cached) {
+        setItem(cached.item);
+        setToppings(cached.toppings);
+        setSides(cached.sides);
+        return;
+      }
+
       try {
         setIsFetching(true);
         // Fetch Menu Item
@@ -62,11 +75,23 @@ const SearchId = () => {
 
         if (customError) throw customError;
 
-        if (customData) {
-          const allCustoms = customData.map((c: any) => c.customization_name);
-          setToppings(allCustoms.filter((c: any) => c.type === "topping"));
-          setSides(allCustoms.filter((c: any) => c.type === "side"));
-        }
+        const allCustoms = customData
+          ? customData.map((c: any) => c.customization_name)
+          : [];
+        const fetchedToppings = allCustoms.filter(
+          (c: any) => c.type === "topping",
+        );
+        const fetchedSides = allCustoms.filter((c: any) => c.type === "side");
+
+        setToppings(fetchedToppings);
+        setSides(fetchedSides);
+
+        // Store in cache
+        setFoodDetailCache(itemId, {
+          item: itemData,
+          toppings: fetchedToppings,
+          sides: fetchedSides,
+        });
       } catch (error: any) {
         Alert.alert("Error", error.message);
       } finally {

@@ -3,6 +3,7 @@ import CustomHeader from "@/components/CustomHeader";
 import CustomInput from "@/components/CustomInput";
 import { supabase } from "@/lib/supabase";
 import useAuthStore from "@/store/auth.store";
+import useDataStore from "@/store/data.store";
 import { UpdateProfileParams, User } from "@/type";
 import { router } from "expo-router";
 import { useLocalSearchParams } from "expo-router/build/hooks";
@@ -16,6 +17,7 @@ const EditProfile = () => {
     mode: "onChange",
   });
   const { user } = useAuthStore();
+  const { clearProfileCache } = useDataStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { profile } = useLocalSearchParams();
 
@@ -78,10 +80,13 @@ const EditProfile = () => {
       const { data: refreshed } = await supabase.auth.getUser();
       useAuthStore.getState().setUser(refreshed.user as User);
 
-      // 4. Success message
+      // 4. Clear profile cache so it re-fetches fresh data
+      if (user?.id) clearProfileCache(user.id);
+
+      // 5. Success message
       Alert.alert("Profile Updated Successfully");
 
-      // 5. Navigate after finishing everything
+      // 6. Navigate after finishing everything
       router.navigate("/profile");
     } catch (error: any) {
       Alert.alert("Update Failed", error.message);
